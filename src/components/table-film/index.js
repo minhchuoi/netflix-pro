@@ -142,7 +142,7 @@ export default function TableFilm(props) {
   return (
     <>
       <Body>
-        <div className="dp-none">
+        <div className={props.displ}>
           <Table
             justify="end"
             className="table"
