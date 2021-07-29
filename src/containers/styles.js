@@ -6,4 +6,7 @@ export const MenuLeft = styled.div`
   left: 0px;
   top: 0px;
   z-index: 4;
+  .tbl{
+    display: none;
+  }
 `;

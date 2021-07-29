@@ -54,7 +54,7 @@ export default function CreateFilm(props) {
   });
 
   return (
-    <Row justify="center">
+    <Row>
       <Body>
         <div className={props.displ}>
           <form className="edit-detail" onSubmit={formik.handleSubmit}>

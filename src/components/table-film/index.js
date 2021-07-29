@@ -152,7 +152,6 @@ export default function TableFilm(props) {
         </div>
       </Body>
       <Modal
-        title="Basic Modal"
         visible={isModalVisible}
         onCancel={handleCancel}
       >

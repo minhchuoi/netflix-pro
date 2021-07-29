@@ -7,7 +7,6 @@ import { CreateFilm, TableFilm, ManageUsers } from "../components";
 import { Menu, Button, Row, Col } from "antd";
 import { MenuLeft } from "./styles"
 import {
-  AppstoreOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   AppstoreAddOutlined,
@@ -59,6 +58,7 @@ export function AdminContainer() {
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
+  console.log(user);
   return (
     <>
       <Header src="" dontShowOnSmallViewPort>
@@ -105,30 +105,21 @@ export function AdminContainer() {
               onSelect={(e) => onClickMenu(e.key)}
             >
               <Menu.Item key="1" icon={<AppstoreAddOutlined />}>
-                Create
+                Create Films
             </Menu.Item>
-              <SubMenu key="sub1" icon={<TableOutlined />} title="Table">
+              <SubMenu key="sub1" icon={<TableOutlined />} title="Table Films">
                 <Menu.Item key="2">Series</Menu.Item>
                 <Menu.Item key="3">Films</Menu.Item>
               </SubMenu>
-              <SubMenu
-                key="sub2"
-                icon={<AppstoreOutlined />}
-                title="Navigation Two"
-              >
-                <Menu.Item key="9">Option 9</Menu.Item>
-                <Menu.Item key="10">Option 10</Menu.Item>
-                <SubMenu key="sub3" title="Submenu">
-                  <Menu.Item key="11">Option 11</Menu.Item>
-                  <Menu.Item key="12">Option 12</Menu.Item>
-                </SubMenu>
-              </SubMenu>
+              <Menu.Item key="4" icon={<AppstoreAddOutlined />}>
+                User
+            </Menu.Item>
             </Menu>
           </MenuLeft>
         </Col>
         <Col span={18}>
           <CreateFilm displ={dpCreate}></CreateFilm>
-          <TableFilm displ={dpTable} category={category}></TableFilm>
+          <TableFilm className='tbl' displ={dpTable} category={category}></TableFilm>
           <ManageUsers></ManageUsers>
         </Col>
       </Row>

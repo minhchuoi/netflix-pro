@@ -91,7 +91,10 @@ export function BrowseContainer({ slides }) {
             he projects in a futile attempt to feel like h is part of the world
             around him.
           </Header.Text>
-          <Header.PlayButton>Play</Header.PlayButton>
+            <Player>
+              <Player.Button />
+              <Player.Video src="/videos/bunny.mp4" />
+          </Player>
         </Header.Feature>
       </Header>
 

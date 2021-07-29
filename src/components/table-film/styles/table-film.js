@@ -6,10 +6,11 @@ export const Body = styled.div`
   background-color: white;
   width: 1200px;
   .dp-block {
-    display: block;
+    display: block !important;
   }
   .dp-none {
-    display: none;
+    height: 0px;
+    display: none !important;
   }
   
 `;
