@@ -1,11 +1,38 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Body } from "./styles/create-film";
-import * as yup from "yup";
-import { Button, Input, Row } from "antd";
-import { useFormik } from "formik";
+import { Form, Button, Input, Select } from "antd";
 import { FirebaseContext } from "../../context/firebase";
 
+const { Option } = Select;
+const layout = {
+  labelCol: {
+    span: 4,
+  },
+  wrapperCol: {
+    span: 16,
+  },
+};
+const validateMessages = {
+  required: '${label} is required!',
+  types: {
+    email: '${label} is not a valid email!',
+  },
+};
+
 export default function CreateFilm(props) {
+  const formRef = React.createRef();
+  const [genre, setGenre] = useState([])
+  const onGenderChange = (value) => {
+    switch (value) {
+      case 'series':
+        setGenre(['documentaries', 'comedies', 'children', 'crime', 'feel-good',]);
+        return;
+
+      case 'films':
+        setGenre(['drama', 'thriller', 'children', 'suspense', 'romance',]);
+    }
+  };
+
   const { firebase } = useContext(FirebaseContext);
   function getUUID() {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
@@ -14,146 +41,119 @@ export default function CreateFilm(props) {
       return elem.toString(16);
     });
   }
-  const initialValues = {
-    addCategory: "",
-    addTitle: "",
-    addDescription: "",
-    addGenre: "",
-    addMaturity: "",
-    addSlug: "",
+
+  const onFinish = (value) => {
+    console.log({
+      id: getUUID(),
+      title: value.title,
+      description: value.description,
+      genre: value.genre,
+      maturity: value.maturity,
+      slug: value.title.toLowerCase().split(' ').join('-'),
+    });
+    firebase
+      .firestore()
+      .collection(value.category)
+      .add({
+        id: getUUID(),
+        title: value.title,
+        description: value.description,
+        genre: value.genre,
+        maturity: value.maturity,
+        slug: value.title.toLowerCase().split(' ').join('-'),
+      })
+      .catch((errors) => {
+        console.log(errors);
+      });
+    formRef.current.resetFields();
+
   };
 
-  const formik = useFormik({
-    enableReinitialize: true,
-    initialValues: initialValues,
-    validationSchema: yup.object().shape({
-      addCategory: yup.string().required("Required"),
-      addTitle: yup.string().required("Required"),
-      addDescription: yup.string().required("Required"),
-      addGenre: yup.string().required("Required"),
-      addMaturity: yup.string().required("Required"),
-      addSlug: yup.string().required("Required"),
-    }),
-    onSubmit: (value, { resetForm }) => {
-      firebase
-        .firestore()
-        .collection(value.addCategory)
-        .add({
-          id: getUUID(),
-          title: value.addTitle,
-          description: value.addDescription,
-          genre: value.addGenre,
-          maturity: value.addMaturity,
-          slug: value.addSlug,
-        })
-        .catch((errors) => {
-          console.log(errors);
-        });
-      formik.resetForm();
-    },
-  });
-
   return (
-    <Row>
-      <Body>
-        <div className={props.displ}>
-          <form className="edit-detail" onSubmit={formik.handleSubmit}>
-            <label htmlFor="addTitle">Category</label>
-            <Input
-              className={
-                formik.touched.addCategory && formik.errors.addCategory
-                  ? "input"
-                  : ""
-              }
-              id="addCategory"
-              name="addCategory"
-              onChange={formik.handleChange}
-              value={formik.values.addCategory}
-            ></Input>
-            {formik.touched.addCategory && formik.errors.addCategory ? (
-              <div>{formik.errors.addCategory}</div>
-            ) : null}
+    <Body>
+      <div className={props.displ}>
+        <Form {...layout} ref={formRef} name="nest-messages" onFinish={onFinish} validateMessages={validateMessages}>
+          <Form.Item
+            name="category"
+            label="Category"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Select
+              onChange={onGenderChange}
+              allowClear
+            >
+              <Option value="films">Films</Option>
+              <Option value="series">Series</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="genre"
+            label="Genre"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Select
+              allowClear
+            >
+              {genre.map((item, index) => <Option key={index} value={item}>{item.charAt(0).toUpperCase() + item.slice(1)}</Option>)}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name='title'
+            label="Title"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name='description'
+            label="Description"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input.TextArea />
+          </Form.Item>
+          <Form.Item
+            name="maturity"
+            label="Maturity"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Select
+              onChange={onGenderChange}
+              allowClear
+            >
+              <Option value="0">0</Option>
+              <Option value="12">12</Option>
+              <Option value="15">15</Option>
+              <Option value="18">18</Option>
 
-            <label htmlFor="addTitle">Title</label>
-            <Input
-              className={
-                formik.touched.addTitle && formik.errors.addTitle ? "input" : ""
-              }
-              id="addTitle"
-              name="addTitle"
-              onChange={formik.handleChange}
-              value={formik.values.addTitle}
-            ></Input>
-            {formik.touched.addTitle && formik.errors.addTitle ? (
-              <div>{formik.errors.addTitle}</div>
-            ) : null}
-
-            <label htmlFor="addDescription">Description</label>
-            <Input
-              className={
-                formik.touched.addDescription && formik.errors.addDescription
-                  ? "input"
-                  : ""
-              }
-              id="addDescription"
-              name="addDescription"
-              onChange={formik.handleChange}
-              value={formik.values.addDescription}
-            ></Input>
-            {formik.touched.addDescription && formik.errors.addDescription ? (
-              <div>{formik.errors.addDescription}</div>
-            ) : null}
-
-            <label htmlFor="addGenre">Genre</label>
-            <Input
-              className={
-                formik.touched.addGenre && formik.errors.addGenre ? "input" : ""
-              }
-              id="addGenre"
-              name="addGenre"
-              onChange={formik.handleChange}
-              value={formik.values.addGenre}
-            ></Input>
-            {formik.touched.addGenre && formik.errors.addGenre ? (
-              <div>{formik.errors.addGenre}</div>
-            ) : null}
-
-            <label htmlFor="addMaturity">Maturity</label>
-            <Input
-              className={
-                formik.touched.addMaturity && formik.errors.addMaturity
-                  ? "input"
-                  : ""
-              }
-              id="addMaturity"
-              name="addMaturity"
-              onChange={formik.handleChange}
-              value={formik.values.addMaturity}
-            ></Input>
-            {formik.touched.addMaturity && formik.errors.addMaturity ? (
-              <div>{formik.errors.addMaturity}</div>
-            ) : null}
-
-            <label htmlFor="addSlug">City</label>
-            <Input
-              className={
-                formik.touched.addSlug && formik.errors.addSlug ? "input" : ""
-              }
-              id="addSlug"
-              name="addSlug"
-              onChange={formik.handleChange}
-              value={formik.values.addSlug}
-            ></Input>
-            {formik.touched.addSlug && formik.errors.addSlug ? (
-              <div>{formik.errors.addSlug}</div>
-            ) : null}
-
-            <Button id="btn-add" type="primary" htmlType="submit">
-              Create
+            </Select>
+          </Form.Item>
+          <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 4 }}>
+            <Button type="primary" htmlType="submit">
+              Submit
             </Button>
-          </form>
-        </div>
-      </Body>
-    </Row>
+          </Form.Item>
+        </Form>
+      </div>
+    </Body>
   );
 }

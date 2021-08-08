@@ -1,17 +1,90 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Table, Button, Modal, Input } from "antd";
 import { Body } from "./styles/table-film";
 import { FirebaseContext } from "../../context/firebase";
-import { useContent } from "../../hooks";
+// import { useContent } from "../../hooks";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { useDispatch, useSelector } from 'react-redux'
+import { addFilms, addSeries  } from '../../pages/slice'
 
 export default function TableFilm(props) {
-  const { series } = useContent("series");
-  const { films } = useContent("films");
+  // const { series } = useContent("series");
+  // const { films } = useContent("films");
+
+  const dispatch = useDispatch();
+  const data = useSelector((state) => state.home);
+
   const { firebase } = useContext(FirebaseContext);
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const getDataSlice = async()=>{
+    await firebase
+      .firestore()
+      .collection('series')
+      .get()
+      .then((snapshot) => {
+        const allContent = snapshot.docs.map((contentObj) => ({
+          ...contentObj.data(),
+          docId: contentObj.id,
+        }));
+        dispatch(addSeries(allContent));
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+    await firebase
+      .firestore()
+      .collection('films')
+      .get()
+      .then((snapshot) => {
+        const allContent = snapshot.docs.map((contentObj) => ({
+          ...contentObj.data(),
+          docId: contentObj.id,
+        }));
+        dispatch(addFilms(allContent))
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  }
+
+  useEffect(() => {
+    getDataSlice();
+    // await firebase
+    //   .firestore()
+    //   .collection('series')
+    //   .get()
+    //   .then((snapshot) => {
+    //     const allContent = snapshot.docs.map((contentObj) => ({
+    //       ...contentObj.data(),
+    //       docId: contentObj.id,
+    //     }));
+    //     dispatch(addSeries(allContent));
+    //   })
+    //   .catch((error) => {
+    //     console.log(error.message);
+    //   });
+    // await firebase
+    //   .firestore()
+    //   .collection('films')
+    //   .get()
+    //   .then((snapshot) => {
+    //     const allContent = snapshot.docs.map((contentObj) => ({
+    //       ...contentObj.data(),
+    //       docId: contentObj.id,
+    //     }));
+    //     dispatch(addFilms(allContent))
+    //   })
+    //   .catch((error) => {
+    //     console.log(error.message);
+    //   });
+
+
+  }, [])
+
+  console.log(data.dataSeries);
 
   const [dataEdit, setDataEdit] = useState({});
   const [initialValues, setInitialValues] = useState({
@@ -39,8 +112,8 @@ export default function TableFilm(props) {
       addMaturity: yup.string().required("Required"),
       addSlug: yup.string().required("Required"),
     }),
-    onSubmit: (value, { resetForm }) => {
-      firebase
+    onSubmit: async (value, { resetForm }) => {
+      await firebase
         .firestore()
         .collection(props.category)
         .doc(dataEdit.docId)
@@ -60,14 +133,15 @@ export default function TableFilm(props) {
         });
       formik.resetForm();
       setIsModalVisible(false);
-      setTimeout(() => location.reload(), 3000);
+      // console.log({dtSeries});
+      setTimeout(() => location.reload());
     },
   });
 
-  const deleteItem = (value) => {
-    firebase
+  const deleteItem = async(value) => {
+    await firebase
       .firestore()
-      .collection("films")
+      .collection(props.category)
       .doc(value.docId)
       .delete()
       .then(() => {
@@ -76,7 +150,8 @@ export default function TableFilm(props) {
       .catch((error) => {
         console.error("Error removing document: ", error.message);
       });
-    setTimeout(() => location.reload(), 3000);
+    getDataSlice();
+    // setTimeout(() => location.reload(), 3000);
   };
   const editItem = (value) => {
     console.log(value);
@@ -147,13 +222,14 @@ export default function TableFilm(props) {
             justify="end"
             className="table"
             columns={columns}
-            dataSource={props.category == "series" ? series : films}
+            dataSource={props.category == "series" ? data.dataSeries : data.dataFilms}
           ></Table>
         </div>
       </Body>
       <Modal
         visible={isModalVisible}
         onCancel={handleCancel}
+        footer={null}
       >
         <form className="edit-detail" onSubmit={formik.handleSubmit}>
           <label htmlFor="addTitle">Title</label>

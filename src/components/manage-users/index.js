@@ -1,36 +1,31 @@
-import React, { useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from 'react-redux'
+import { getData, updateData, deleteData } from '../../pages/slice'
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Table, Button, Modal, Input } from "antd";
 import { Body } from "./styles/manage-users";
-import { FirebaseContext } from "../../context/firebase";
-import { useContent } from "../../hooks";
 import { useFormik } from "formik";
 import * as yup from "yup";
 
 export default function ManageUsers(props) {
-  const { series } = useContent("series");
-  const { films } = useContent("films");
-  const { firebase } = useContext(FirebaseContext);
+  const dispatch = useDispatch();
+  const data = useSelector((state) => state.home);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  var user = firebase.auth().currentUser;
-
-  if (user != null) {
-    user.providerData.forEach(function (profile) {
-      console.log("Sign-in provider: " + profile.providerId);
-      console.log("  Provider-specific UID: " + profile.uid);
-      console.log("  Name: " + profile.displayName);
-      console.log("  Email: " + profile.email);
-      console.log("  Photo URL: " + profile.photoURL);
-    });
-  }
   const [dataEdit, setDataEdit] = useState({});
   const [initialValues, setInitialValues] = useState({
-    addTitle: "",
-    addDescription: "",
-    addGenre: "",
-    addMaturity: "",
-    addSlug: "",
+    addEmail: "",
+    addName: "",
   });
+  useEffect(() => {
+    dispatch(getData())
+  }, [dispatch])
+
+  const deleteItem = async(value) => {
+    await dispatch(deleteData(value.uid));
+    dispatch(getData());
+    setTimeout(() => location.reload(), 3000);
+  };
+
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -39,93 +34,60 @@ export default function ManageUsers(props) {
     setIsModalVisible(false);
   };
 
-  const formik = useFormik({
-    enableReinitialize: true,
-    initialValues: initialValues,
-    validationSchema: yup.object().shape({
-      addTitle: yup.string().required("Required"),
-      addDescription: yup.string().required("Required"),
-      addGenre: yup.string().required("Required"),
-      addMaturity: yup.string().required("Required"),
-      addSlug: yup.string().required("Required"),
-    }),
-    onSubmit: (value, { resetForm }) => {
-      firebase
-        .firestore()
-        .collection(props.category)
-        .doc(dataEdit.docId)
-        .set({
-          id: dataEdit.id,
-          title: value.addTitle,
-          description: value.addDescription,
-          genre: value.addGenre,
-          maturity: value.addMaturity,
-          slug: value.addSlug,
-        })
-        .then(() => {
-          console.log("Document successfully written!");
-        })
-        .catch((error) => {
-          console.error("Error writing document: ", error);
-        });
-      formik.resetForm();
-      setIsModalVisible(false);
-      setTimeout(() => location.reload(), 3000);
-    },
-  });
-
-  const deleteItem = (value) => {
-    firebase
-      .firestore()
-      .collection("films")
-      .doc(value.docId)
-      .delete()
-      .then(() => {
-        console.log("Document successfully deleted!");
-      })
-      .catch((error) => {
-        console.error("Error removing document: ", error.message);
-      });
-    setTimeout(() => location.reload(), 3000);
-  };
   const editItem = (value) => {
     console.log(value);
     setDataEdit(value);
     setInitialValues({
-      addTitle: value.title,
-      addDescription: value.description,
-      addGenre: value.genre,
-      addMaturity: value.maturity,
-      addSlug: value.slug,
+      addEmail: value.email,
+      addName: value.displayName,
     });
     showModal();
   };
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues: initialValues,
+    validationSchema: yup.object().shape({
+      addEmail: yup.string().required("Required"),
+      addName: yup.string().required("Required"),
+    }),
+    onSubmit: async(value, { resetForm }) => {
+      console.log(dataEdit);
+      console.log({
+        email: value.addEmail,
+        displayName: value.addName
+      });
+      await dispatch(updateData({
+        uid: dataEdit.uid,
+        email: value.addEmail,
+        displayName: value.addName
+      }));
+      formik.resetForm();
+      setIsModalVisible(false);
+      dispatch(getData())
+      // setTimeout(() => location.reload(), 1500);
+    },
+  });
+
   const columns = [
     {
-      title: "Title",
-      dataIndex: "title",
-      key: "title",
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
     },
     {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      //   render: function abc(text) {<a href="#">{text}</a>},
+      title: "Display name",
+      dataIndex: "displayName",
+      key: "displayName",
     },
     {
-      title: "Genre",
-      dataIndex: "genre",
-      key: "genre",
-    },
-    {
-      title: "Maturity",
-      dataIndex: "maturity",
-      key: "maturity",
-    },
-    {
-      title: "Slug",
-      dataIndex: "slug",
-      key: "slug",
+      title: "Avatar",
+      dataIndex: "photoURL",
+      key: "photoURL",
+      render: function avt(record) {
+        return (
+          <img className="imgAvt" alt={record.photoURL} src={`/images/users/${record}.png`} />
+        )
+      }
     },
     {
       className: "action",
@@ -149,95 +111,48 @@ export default function ManageUsers(props) {
       },
     },
   ];
-
   return (
-    <>
-      <Body>
-        <Table
-          justify="end"
-          className="table"
-          columns={columns}
-          dataSource={props.category == "series" ? series : films}
-        ></Table>
-      </Body>
+    <Body>
+      <div className={props.displ}>
+      <Table
+        justify="end"
+        className="table"
+        columns={columns}
+        dataSource={data.data}
+      ></Table>
       <Modal
-        title="Basic Modal"
         visible={isModalVisible}
         onCancel={handleCancel}
       >
         <form className="edit-detail" onSubmit={formik.handleSubmit}>
-          <label htmlFor="addTitle">Title</label>
+          <label htmlFor="Email">Email</label>
           <Input
             className={
-              formik.touched.addTitle && formik.errors.addTitle ? "input" : ""
+              formik.touched.addEmail && formik.errors.addEmail ? "input" : ""
             }
-            id="addTitle"
-            name="addTitle"
+            id="addEmail"
+            name="addEmail"
             onChange={formik.handleChange}
-            value={formik.values.addTitle}
+            value={formik.values.addEmail}
           ></Input>
-          {formik.touched.addTitle && formik.errors.addTitle ? (
-            <div>{formik.errors.addTitle}</div>
+          {formik.touched.addEmail && formik.errors.addEmail ? (
+            <div>{formik.errors.addEmail}</div>
           ) : null}
 
-          <label htmlFor="addDescription">Description</label>
-          <Input.TextArea
+          <label htmlFor="addName">Name</label>
+          <Input
             className={
-              formik.touched.addDescription && formik.errors.addDescription
+              formik.touched.addName && formik.errors.addName
                 ? "input"
                 : ""
             }
-            id="addDescription"
-            name="addDescription"
+            id="addName"
+            name="addName"
             onChange={formik.handleChange}
-            value={formik.values.addDescription}
-          ></Input.TextArea>
-          {formik.touched.addDescription && formik.errors.addDescription ? (
-            <div>{formik.errors.addDescription}</div>
-          ) : null}
-
-          <label htmlFor="addGenre">Genre</label>
-          <Input
-            className={
-              formik.touched.addGenre && formik.errors.addGenre ? "input" : ""
-            }
-            id="addGenre"
-            name="addGenre"
-            onChange={formik.handleChange}
-            value={formik.values.addGenre}
+            value={formik.values.addName}
           ></Input>
-          {formik.touched.addGenre && formik.errors.addGenre ? (
-            <div>{formik.errors.addGenre}</div>
-          ) : null}
-
-          <label htmlFor="addMaturity">Maturity</label>
-          <Input
-            className={
-              formik.touched.addMaturity && formik.errors.addMaturity
-                ? "input"
-                : ""
-            }
-            id="addMaturity"
-            name="addMaturity"
-            onChange={formik.handleChange}
-            value={formik.values.addMaturity}
-          ></Input>
-          {formik.touched.addMaturity && formik.errors.addMaturity ? (
-            <div>{formik.errors.addMaturity}</div>
-          ) : null}
-
-          <label htmlFor="addSlug">City</label>
-          <Input
-            className={
-              formik.touched.addSlug && formik.errors.addSlug ? "input" : ""
-            }
-            id="addSlug"
-            name="addSlug"
-            onChange={formik.handleChange}
-            value={formik.values.addSlug}
-          ></Input>
-          {formik.touched.addSlug && formik.errors.addSlug ? (
-            <div>{formik.errors.addSlug}</div>
+          {formik.touched.addName && formik.errors.addName ? (
+            <div>{formik.errors.addName}</div>
           ) : null}
 
           <Button id="btn-add" type="primary" htmlType="submit">
@@ -245,6 +160,7 @@ export default function ManageUsers(props) {
           </Button>
         </form>
       </Modal>
-    </>
+      </div>
+    </Body>
   );
 }

@@ -4,7 +4,7 @@ import { FirebaseContext } from "../context/firebase";
 export default function useContent(target) {
   const [content, setContent] = useState([]);
   const { firebase } = useContext(FirebaseContext);
-
+ 
   useEffect(() => {
     firebase
       .firestore()
@@ -22,6 +22,5 @@ export default function useContent(target) {
         console.log(error.message);
       });
   }, []);
-
   return { [target]: content };
 }

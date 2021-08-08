@@ -11,5 +11,7 @@ export const Body = styled.div`
   .dp-none {
     display: none;
   }
-  
+  .imgAvt{
+    height: 60px;
+  }
 `;

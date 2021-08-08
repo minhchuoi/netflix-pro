@@ -16,8 +16,9 @@ import {
 const { SubMenu } = Menu;
 
 export function AdminContainer() {
-  const [dpCreate, setDpCreate] = useState("dp-none")
+  const [dpCreate, setDpCreate] = useState("dp-block")
   const [dpTable, setDpTable] = useState("dp-none")
+  const [dpUser, setDpUser] = useState("dp-none")
   const [category, setCategory] = useState("films")
   // const mCreate = () => {
   //   setDpCreate("dp-block")
@@ -39,17 +40,24 @@ export function AdminContainer() {
     if (key == "1") {
       setDpCreate("dp-block")
       setDpTable("dp-none")
-      console.log(dpCreate);
+      setDpUser("dp-none")
     }
     if (key == "2") {
       setDpCreate("dp-none")
       setDpTable("dp-block")
+      setDpUser("dp-none")
       setCategory("series")
     }
     if (key == "3") {
       setDpCreate("dp-none")
       setDpTable("dp-block")
+      setDpUser("dp-none")
       setCategory("films")
+    }
+    if (key == "4") {
+      setDpCreate("dp-none")
+      setDpTable("dp-none")
+      setDpUser("dp-block")
     }
   }
   const { firebase } = useContext(FirebaseContext);
@@ -58,7 +66,6 @@ export function AdminContainer() {
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
-  console.log(user);
   return (
     <>
       <Header src="" dontShowOnSmallViewPort>
@@ -120,7 +127,7 @@ export function AdminContainer() {
         <Col span={18}>
           <CreateFilm displ={dpCreate}></CreateFilm>
           <TableFilm className='tbl' displ={dpTable} category={category}></TableFilm>
-          <ManageUsers></ManageUsers>
+          <ManageUsers displ={dpUser}></ManageUsers>
         </Col>
       </Row>
     </>

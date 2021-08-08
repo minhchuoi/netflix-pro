@@ -6,17 +6,23 @@ import logo from "../logo.svg";
 import { FirebaseContext } from "../context/firebase";
 import { SelectProfileContainer } from "./profiles";
 import { FooterContainer } from "./footer";
+import { useContent } from '../hooks';
+import { selectionFilter } from '../utils';
 
-export function BrowseContainer({ slides }) {
+export function BrowseContainer() {
+  const { series } = useContent('series');
+  const { films } = useContent('films');
+  const slides = selectionFilter({ series, films });
+  
   const [category, setCategory] = useState("series");
   const [profile, setProfile] = useState({});
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [slideRows, setSlideRows] = useState([]);
+  const [idVideo, setIdVideo] = useState({})
 
   const { firebase } = useContext(FirebaseContext);
   const user = firebase.auth().currentUser || {};
-  console.log(user);
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
@@ -29,10 +35,11 @@ export function BrowseContainer({ slides }) {
 
   useEffect(() => {
     const fuse = new Fuse(slideRows, {
-      keys: ["data.description", "data.title", "data.genre"],
+      // keys: ["data.description", "data.title", "data.genre"],
+      keys: ["title"],
     });
     const results = fuse.search(searchTerm).map(({ item }) => item);
-
+    console.log(fuse.search(searchTerm));
     if (slideRows.length > 0 && searchTerm.length > 3 && results.length > 0) {
       setSlideRows(results);
     } else {
@@ -40,6 +47,7 @@ export function BrowseContainer({ slides }) {
     }
   }, [searchTerm]);
 
+  console.log(slideRows);
   return profile.displayName ? (
     <>
       {loading ? <Loading src={user.photoURL} /> : <Loading.ReleaseBody />}
@@ -93,7 +101,7 @@ export function BrowseContainer({ slides }) {
           </Header.Text>
             <Player>
               <Player.Button />
-              <Player.Video src="/videos/bunny.mp4" />
+              <Player.Video src="WbliHNs4q14" />
           </Player>
         </Header.Feature>
       </Header>
@@ -104,7 +112,7 @@ export function BrowseContainer({ slides }) {
             <Card.Title>{slideItem.title}</Card.Title>
             <Card.Entities>
               {slideItem.data.map((item) => (
-                <Card.Item key={item.docId} item={item}>
+                <Card.Item key={item.docId} setIdVideo={setIdVideo} item={item}>
                   <Card.Image
                     src={`/images/${category}/${item.genre}/${item.slug}/small.jpg`}
                   />
@@ -118,7 +126,7 @@ export function BrowseContainer({ slides }) {
             <Card.Feature category={category}>
               <Player>
                 <Player.Button />
-                <Player.Video src="/videos/bunny.mp4" />
+                <Player.Video src={idVideo} />
               </Player>
             </Card.Feature>
           </Card>

@@ -12,5 +12,7 @@ export { default as Player } from "./player";
 export { default as CreateFilm } from "./create-film"
 export { default as TableFilm } from "./table-film"
 export { default as ManageUsers } from "./manage-users"
+export { default as ForgotPW } from "./forgot-pw"
+
 
 
