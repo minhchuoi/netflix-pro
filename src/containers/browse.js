@@ -6,14 +6,18 @@ import logo from "../logo.svg";
 import { FirebaseContext } from "../context/firebase";
 import { SelectProfileContainer } from "./profiles";
 import { FooterContainer } from "./footer";
-import { useContent } from '../hooks';
+// import { useContent } from '../hooks';
 import { selectionFilter } from '../utils';
 
-export function BrowseContainer() {
-  const { series } = useContent('series');
-  const { films } = useContent('films');
-  const slides = selectionFilter({ series, films });
-  
+
+export function BrowseContainer({slides, seriess, filmss}) {
+  // const { series } = useContent('series');
+  // const { films } = useContent('films');
+  // const slides = selectionFilter({ series, films });
+
+  //testtt
+  // const [dataShow, setDataShow] = useState()
+
   const [category, setCategory] = useState("series");
   const [profile, setProfile] = useState({});
   const [loading, setLoading] = useState(true);
@@ -33,21 +37,41 @@ export function BrowseContainer() {
     setSlideRows(slides[category]);
   }, [slides, category]);
 
+  // console.log(seriess);
   useEffect(() => {
-    const fuse = new Fuse(slideRows, {
-      // keys: ["data.description", "data.title", "data.genre"],
-      keys: ["title"],
-    });
-    const results = fuse.search(searchTerm).map(({ item }) => item);
-    console.log(fuse.search(searchTerm));
-    if (slideRows.length > 0 && searchTerm.length > 3 && results.length > 0) {
-      setSlideRows(results);
-    } else {
-      setSlideRows(slides[category]);
+    if(category==='series'){
+      const fuse = new Fuse(seriess, {
+        threshold: 0.3,
+        keys: ["title", "description", "genre"],
+      });
+      const series = fuse.search(searchTerm).map(({ item }) => item);
+      const slidess = selectionFilter({ series, filmss });
+      console.log(slidess);
+      if (slideRows.length > 0 && searchTerm.length > 1 && series.length > 0) {
+        setSlideRows(slidess[category]);
+      } else {
+        setSlideRows(slides[category]);
+      }
     }
+    if(category==='films'){
+      const fuse = new Fuse(filmss, {
+        threshold: 0.3,
+        keys: ["title", "description", "genre"],
+      });
+      const films = fuse.search(searchTerm).map(({ item }) => item);
+      const slidess = selectionFilter({ seriess, films });
+      console.log(slidess);
+      if (slideRows.length > 0 && searchTerm.length > 1 && films.length > 0) {
+        setSlideRows(slidess[category]);
+      } else {
+        setSlideRows(slides[category]);
+      }
+    }
+    
+    
   }, [searchTerm]);
 
-  console.log(slideRows);
+  // console.log(slideRows);
   return profile.displayName ? (
     <>
       {loading ? <Loading src={user.photoURL} /> : <Loading.ReleaseBody />}

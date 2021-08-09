@@ -93,6 +93,7 @@ export default function TableFilm(props) {
     addGenre: "",
     addMaturity: "",
     addSlug: "",
+    addVideo:"",
   });
   const showModal = () => {
     setIsModalVisible(true);
@@ -111,8 +112,9 @@ export default function TableFilm(props) {
       addGenre: yup.string().required("Required"),
       addMaturity: yup.string().required("Required"),
       addSlug: yup.string().required("Required"),
+      addVideo: yup.string().required("Required"),
     }),
-    onSubmit: async (value, { resetForm }) => {
+    onSubmit: async (value) => {
       await firebase
         .firestore()
         .collection(props.category)
@@ -124,6 +126,7 @@ export default function TableFilm(props) {
           genre: value.addGenre,
           maturity: value.addMaturity,
           slug: value.addSlug,
+          idVideo: value.addVideo,
         })
         .then(() => {
           console.log("Document successfully written!");
@@ -131,10 +134,12 @@ export default function TableFilm(props) {
         .catch((error) => {
           console.error("Error writing document: ", error);
         });
+      await getDataSlice()
       formik.resetForm();
       setIsModalVisible(false);
+      
       // console.log({dtSeries});
-      setTimeout(() => location.reload());
+      // setTimeout(() => location.reload());
     },
   });
 
@@ -162,6 +167,7 @@ export default function TableFilm(props) {
       addGenre: value.genre,
       addMaturity: value.maturity,
       addSlug: value.slug,
+      addVideo: value.idVideo,
     });
     showModal();
   };
@@ -190,6 +196,11 @@ export default function TableFilm(props) {
       title: "Slug",
       dataIndex: "slug",
       key: "slug",
+    }, 
+    {
+      title: "ID Video",
+      dataIndex: "idVideo",
+      key: "idVideo",
     },
     {
       className: "action",
@@ -292,7 +303,7 @@ export default function TableFilm(props) {
             <div>{formik.errors.addMaturity}</div>
           ) : null}
 
-          <label htmlFor="addSlug">City</label>
+          <label htmlFor="addSlug">Slug</label>
           <Input
             className={
               formik.touched.addSlug && formik.errors.addSlug ? "input" : ""
@@ -304,6 +315,19 @@ export default function TableFilm(props) {
           ></Input>
           {formik.touched.addSlug && formik.errors.addSlug ? (
             <div>{formik.errors.addSlug}</div>
+          ) : null}
+          <label htmlFor="addSlug">Video</label>
+          <Input
+            className={
+              formik.touched.addVideo && formik.errors.addVideo ? "input" : ""
+            }
+            id="addVideo"
+            name="addVideo"
+            onChange={formik.handleChange}
+            value={formik.values.addVideo}
+          ></Input>
+          {formik.touched.addVideo && formik.errors.addVideo ? (
+            <div>{formik.errors.addVideo}</div>
           ) : null}
 
           <Button id="btn-add" type="primary" htmlType="submit">

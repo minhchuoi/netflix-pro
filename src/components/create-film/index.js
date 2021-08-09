@@ -2,6 +2,8 @@ import React, { useContext, useState } from "react";
 import { Body } from "./styles/create-film";
 import { Form, Button, Input, Select } from "antd";
 import { FirebaseContext } from "../../context/firebase";
+import { useDispatch } from 'react-redux'
+import { addFilms, addSeries  } from '../../pages/slice'
 
 const { Option } = Select;
 const layout = {
@@ -20,6 +22,8 @@ const validateMessages = {
 };
 
 export default function CreateFilm(props) {
+  const dispatch = useDispatch();
+
   const formRef = React.createRef();
   const [genre, setGenre] = useState([])
   const onGenderChange = (value) => {
@@ -42,16 +46,47 @@ export default function CreateFilm(props) {
     });
   }
 
-  const onFinish = (value) => {
-    console.log({
-      id: getUUID(),
-      title: value.title,
-      description: value.description,
-      genre: value.genre,
-      maturity: value.maturity,
-      slug: value.title.toLowerCase().split(' ').join('-'),
-    });
-    firebase
+  const getDataSlice = async () => {
+    await firebase
+      .firestore()
+      .collection('series')
+      .get()
+      .then((snapshot) => {
+        const allContent = snapshot.docs.map((contentObj) => ({
+          ...contentObj.data(),
+          docId: contentObj.id,
+        }));
+        dispatch(addSeries(allContent));
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+    await firebase
+      .firestore()
+      .collection('films')
+      .get()
+      .then((snapshot) => {
+        const allContent = snapshot.docs.map((contentObj) => ({
+          ...contentObj.data(),
+          docId: contentObj.id,
+        }));
+        dispatch(addFilms(allContent))
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  }
+
+  const onFinish = async (value) => {
+    // console.log({
+    //   id: getUUID(),
+    //   title: value.title,
+    //   description: value.description,
+    //   genre: value.genre,
+    //   maturity: value.maturity,
+    //   slug: value.title.toLowerCase().split(' ').join('-'),
+    // });
+    await firebase
       .firestore()
       .collection(value.category)
       .add({
@@ -61,10 +96,12 @@ export default function CreateFilm(props) {
         genre: value.genre,
         maturity: value.maturity,
         slug: value.title.toLowerCase().split(' ').join('-'),
+        idVideo: value.video,
       })
       .catch((errors) => {
         console.log(errors);
       });
+    getDataSlice();
     formRef.current.resetFields();
 
   };
@@ -146,6 +183,17 @@ export default function CreateFilm(props) {
               <Option value="18">18</Option>
 
             </Select>
+          </Form.Item>
+          <Form.Item
+            name='video'
+            label="Video"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
           </Form.Item>
           <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 4 }}>
             <Button type="primary" htmlType="submit">
