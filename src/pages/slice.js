@@ -26,6 +26,8 @@ export const updateData = createAsyncThunk(
 
 const initialState = {
   data: [],
+  dataModel: [],
+  dataRatingAdmin:[],
   status: null,
   modal: "modalFalse",
   dataSeries:[],
@@ -46,6 +48,19 @@ const homeSlice = createSlice({
       return {
         ...state,
         dataSeries: action.payload,
+      };
+    },
+    addRatingModal: (state, action) => {
+      return {
+        ...state,
+        dataModel: action.payload,
+      };
+    },
+    addRatingAdmin: (state, action) => {
+      console.log(action.payload);
+      return {
+        ...state,
+        dataRatingAdmin: action.payload,
       };
     },
     // closeModal: (state, action) => {
@@ -79,4 +94,4 @@ const homeSlice = createSlice({
 });
 
 export default homeSlice.reducer;
-export const { addSeries, addFilms } = homeSlice.actions;
+export const { addSeries, addFilms, addRatingModal, addRatingAdmin } = homeSlice.actions;

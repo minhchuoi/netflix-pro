@@ -3,14 +3,15 @@ import { Header } from "../components";
 import logo from "../logo.svg";
 import { FirebaseContext } from "../context/firebase";
 import * as ROUTES from "../constants/routes";
-import { CreateFilm, TableFilm, ManageUsers } from "../components";
+import { CreateFilm, TableFilm, ManageUsers, RatingUser } from "../components";
 import { Menu, Button, Row, Col } from "antd";
 import { MenuLeft } from "./styles"
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   AppstoreAddOutlined,
-  TableOutlined
+  TableOutlined,
+  CommentOutlined
 } from "@ant-design/icons";
 
 const { SubMenu } = Menu;
@@ -19,45 +20,42 @@ export function AdminContainer() {
   const [dpCreate, setDpCreate] = useState("dp-block")
   const [dpTable, setDpTable] = useState("dp-none")
   const [dpUser, setDpUser] = useState("dp-none")
+  const [dpTableRating, setDpTableRating] = useState("dp-none")
   const [category, setCategory] = useState("films")
-  // const mCreate = () => {
-  //   setDpCreate("dp-block")
-  //   setDpTable("dp-none")
-  //   console.log(dpCreate);
-  // }
-  // const mFilms = () => {
-  //   setDpCreate("dp-none")
-  //   setDpTable("dp-block")
-  //   setCategory("films")
-  // }
-  // const mSeries = () => {
-  //   setDpCreate("dp-none")
-  //   setDpTable("dp-block")
-  //   setCategory("series")
-  // }
 
   const onClickMenu = (key) => {
     if (key == "1") {
       setDpCreate("dp-block")
       setDpTable("dp-none")
       setDpUser("dp-none")
+      setDpTableRating("dp-none")
     }
     if (key == "2") {
       setDpCreate("dp-none")
       setDpTable("dp-block")
       setDpUser("dp-none")
+      setDpTableRating("dp-none")
       setCategory("series")
     }
     if (key == "3") {
       setDpCreate("dp-none")
       setDpTable("dp-block")
       setDpUser("dp-none")
+      setDpTableRating("dp-none")
       setCategory("films")
     }
     if (key == "4") {
       setDpCreate("dp-none")
       setDpTable("dp-none")
+      setDpTableRating("dp-none")
       setDpUser("dp-block")
+    }
+    if (key == "5"){
+      setDpCreate("dp-none")
+      setDpTable("dp-none")
+      setDpUser("dp-none")
+      setDpTableRating("dp-block")
+      
     }
   }
   const { firebase } = useContext(FirebaseContext);
@@ -118,6 +116,9 @@ export function AdminContainer() {
                 <Menu.Item key="2">Series</Menu.Item>
                 <Menu.Item key="3">Films</Menu.Item>
               </SubMenu>
+              <Menu.Item key="5" icon={<CommentOutlined />}>
+                Rating User
+            </Menu.Item>
               <Menu.Item key="4" icon={<AppstoreAddOutlined />}>
                 User
             </Menu.Item>
@@ -128,6 +129,7 @@ export function AdminContainer() {
           <CreateFilm displ={dpCreate}></CreateFilm>
           <TableFilm className='tbl' displ={dpTable} category={category}></TableFilm>
           <ManageUsers displ={dpUser}></ManageUsers>
+          <RatingUser displ={dpTableRating}></RatingUser>
         </Col>
       </Row>
     </>

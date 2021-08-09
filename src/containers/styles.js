@@ -9,4 +9,7 @@ export const MenuLeft = styled.div`
   .tbl{
     display: none;
   }
+  .btn-user-rating{
+    margin-top: 5px;
+  }
 `;

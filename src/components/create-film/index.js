@@ -97,6 +97,7 @@ export default function CreateFilm(props) {
         maturity: value.maturity,
         slug: value.title.toLowerCase().split(' ').join('-'),
         idVideo: value.video,
+        rating: value.rating,
       })
       .catch((errors) => {
         console.log(errors);
@@ -187,6 +188,17 @@ export default function CreateFilm(props) {
           <Form.Item
             name='video'
             label="Video"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name='rating'
+            label="Expert reviews"
             rules={[
               {
                 required: true,

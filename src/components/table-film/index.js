@@ -3,15 +3,13 @@ import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Table, Button, Modal, Input } from "antd";
 import { Body } from "./styles/table-film";
 import { FirebaseContext } from "../../context/firebase";
-// import { useContent } from "../../hooks";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useDispatch, useSelector } from 'react-redux'
 import { addFilms, addSeries  } from '../../pages/slice'
 
 export default function TableFilm(props) {
-  // const { series } = useContent("series");
-  // const { films } = useContent("films");
+
 
   const dispatch = useDispatch();
   const data = useSelector((state) => state.home);
@@ -52,47 +50,15 @@ export default function TableFilm(props) {
 
   useEffect(() => {
     getDataSlice();
-    // await firebase
-    //   .firestore()
-    //   .collection('series')
-    //   .get()
-    //   .then((snapshot) => {
-    //     const allContent = snapshot.docs.map((contentObj) => ({
-    //       ...contentObj.data(),
-    //       docId: contentObj.id,
-    //     }));
-    //     dispatch(addSeries(allContent));
-    //   })
-    //   .catch((error) => {
-    //     console.log(error.message);
-    //   });
-    // await firebase
-    //   .firestore()
-    //   .collection('films')
-    //   .get()
-    //   .then((snapshot) => {
-    //     const allContent = snapshot.docs.map((contentObj) => ({
-    //       ...contentObj.data(),
-    //       docId: contentObj.id,
-    //     }));
-    //     dispatch(addFilms(allContent))
-    //   })
-    //   .catch((error) => {
-    //     console.log(error.message);
-    //   });
-
 
   }, [])
-
-  console.log(data.dataSeries);
 
   const [dataEdit, setDataEdit] = useState({});
   const [initialValues, setInitialValues] = useState({
     addTitle: "",
     addDescription: "",
-    addGenre: "",
+    addRating: "",
     addMaturity: "",
-    addSlug: "",
     addVideo:"",
   });
   const showModal = () => {
@@ -109,9 +75,8 @@ export default function TableFilm(props) {
     validationSchema: yup.object().shape({
       addTitle: yup.string().required("Required"),
       addDescription: yup.string().required("Required"),
-      addGenre: yup.string().required("Required"),
+      addRating: yup.string().required("Required"),
       addMaturity: yup.string().required("Required"),
-      addSlug: yup.string().required("Required"),
       addVideo: yup.string().required("Required"),
     }),
     onSubmit: async (value) => {
@@ -123,9 +88,8 @@ export default function TableFilm(props) {
           id: dataEdit.id,
           title: value.addTitle,
           description: value.addDescription,
-          genre: value.addGenre,
+          rating: value.addRating,
           maturity: value.addMaturity,
-          slug: value.addSlug,
           idVideo: value.addVideo,
         })
         .then(() => {
@@ -134,7 +98,7 @@ export default function TableFilm(props) {
         .catch((error) => {
           console.error("Error writing document: ", error);
         });
-      await getDataSlice()
+      await getDataSlice();
       formik.resetForm();
       setIsModalVisible(false);
       
@@ -164,9 +128,8 @@ export default function TableFilm(props) {
     setInitialValues({
       addTitle: value.title,
       addDescription: value.description,
-      addGenre: value.genre,
+      addRating: value.rating,
       addMaturity: value.maturity,
-      addSlug: value.slug,
       addVideo: value.idVideo,
     });
     showModal();
@@ -183,20 +146,15 @@ export default function TableFilm(props) {
       key: "description",
     },
     {
-      title: "Genre",
-      dataIndex: "genre",
-      key: "genre",
+      title: "Rating",
+      dataIndex: "rating",
+      key: "Rating",
     },
     {
       title: "Maturity",
       dataIndex: "maturity",
       key: "maturity",
     },
-    {
-      title: "Slug",
-      dataIndex: "slug",
-      key: "slug",
-    }, 
     {
       title: "ID Video",
       dataIndex: "idVideo",
@@ -273,18 +231,18 @@ export default function TableFilm(props) {
             <div>{formik.errors.addDescription}</div>
           ) : null}
 
-          <label htmlFor="addGenre">Genre</label>
+          <label htmlFor="addRating">Rating</label>
           <Input
             className={
-              formik.touched.addGenre && formik.errors.addGenre ? "input" : ""
+              formik.touched.addRating && formik.errors.addRating ? "input" : ""
             }
-            id="addGenre"
-            name="addGenre"
+            id="addRating"
+            name="addRating"
             onChange={formik.handleChange}
-            value={formik.values.addGenre}
+            value={formik.values.addRating}
           ></Input>
-          {formik.touched.addGenre && formik.errors.addGenre ? (
-            <div>{formik.errors.addGenre}</div>
+          {formik.touched.addRating && formik.errors.addRating ? (
+            <div>{formik.errors.addRating}</div>
           ) : null}
 
           <label htmlFor="addMaturity">Maturity</label>
@@ -303,19 +261,6 @@ export default function TableFilm(props) {
             <div>{formik.errors.addMaturity}</div>
           ) : null}
 
-          <label htmlFor="addSlug">Slug</label>
-          <Input
-            className={
-              formik.touched.addSlug && formik.errors.addSlug ? "input" : ""
-            }
-            id="addSlug"
-            name="addSlug"
-            onChange={formik.handleChange}
-            value={formik.values.addSlug}
-          ></Input>
-          {formik.touched.addSlug && formik.errors.addSlug ? (
-            <div>{formik.errors.addSlug}</div>
-          ) : null}
           <label htmlFor="addSlug">Video</label>
           <Input
             className={

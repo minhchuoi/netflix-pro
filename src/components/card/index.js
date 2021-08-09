@@ -57,7 +57,7 @@ Card.Meta = function CardMeta({ children, ...restProps }) {
   return <Meta {...restProps}>{children}</Meta>;
 };
 
-Card.Item = function CardItem({ setIdVideo, item, children, ...restProps }) {
+Card.Item = function CardItem({setItem, setIdVideo, item, children, ...restProps }) {
   const { setShowFeature, setItemFeature } = useContext(FeatureContext);
 
   return (
@@ -65,7 +65,8 @@ Card.Item = function CardItem({ setIdVideo, item, children, ...restProps }) {
       onClick={() => {
         setItemFeature(item);
         setShowFeature(true);
-        setIdVideo(item?.idVideo)
+        setIdVideo(item?.idVideo);
+        setItem(item);
       }}
       {...restProps}
     >
