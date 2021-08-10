@@ -4,6 +4,7 @@ import { Form, Button, Input, Select } from "antd";
 import { FirebaseContext } from "../../context/firebase";
 import { useDispatch } from 'react-redux'
 import { addFilms, addSeries  } from '../../pages/slice'
+import { StarTop } from '../../components'
 
 const { Option } = Select;
 const layout = {
@@ -197,15 +198,24 @@ export default function CreateFilm(props) {
             <Input />
           </Form.Item>
           <Form.Item
-            name='rating'
-            label="Expert reviews"
+            name="rating"
+            label="Rating"
             rules={[
               {
                 required: true,
               },
             ]}
           >
-            <Input />
+            <Select
+              className='inputComment'
+            // allowClear
+            >
+              <Option value="1"><StarTop rating={1}></StarTop></Option>
+              <Option value="2"><StarTop rating={2}></StarTop></Option>
+              <Option value="3"><StarTop rating={3}></StarTop></Option>
+              <Option value="4"><StarTop rating={4}></StarTop></Option>
+              <Option value="5"><StarTop rating={5}></StarTop></Option>
+            </Select>
           </Form.Item>
           <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 4 }}>
             <Button type="primary" htmlType="submit">

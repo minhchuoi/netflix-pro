@@ -18,5 +18,6 @@ export { default as UserRating } from "./user-rating"
 export { default as StarTop} from "./star-top-in-modal"
 export { default as RatingUser} from "./table-rating-user"
 export { default as MyRating} from "./my-rating"
+export { default as ChartFilm} from "./chart-film"
 
 

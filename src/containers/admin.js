@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Header } from "../components";
+import { ChartFilm, Header } from "../components";
 import logo from "../logo.svg";
 import { FirebaseContext } from "../context/firebase";
 import * as ROUTES from "../constants/routes";
@@ -11,7 +11,8 @@ import {
   MenuFoldOutlined,
   AppstoreAddOutlined,
   TableOutlined,
-  CommentOutlined
+  CommentOutlined,
+  BarChartOutlined
 } from "@ant-design/icons";
 
 const { SubMenu } = Menu;
@@ -21,6 +22,7 @@ export function AdminContainer() {
   const [dpTable, setDpTable] = useState("dp-none")
   const [dpUser, setDpUser] = useState("dp-none")
   const [dpTableRating, setDpTableRating] = useState("dp-none")
+  const [dpChart, setDpChart] = useState("dp-none")
   const [category, setCategory] = useState("films")
 
   const onClickMenu = (key) => {
@@ -29,6 +31,7 @@ export function AdminContainer() {
       setDpTable("dp-none")
       setDpUser("dp-none")
       setDpTableRating("dp-none")
+      setDpChart('dp-none')
     }
     if (key == "2") {
       setDpCreate("dp-none")
@@ -36,6 +39,7 @@ export function AdminContainer() {
       setDpUser("dp-none")
       setDpTableRating("dp-none")
       setCategory("series")
+      setDpChart('dp-none')
     }
     if (key == "3") {
       setDpCreate("dp-none")
@@ -43,19 +47,38 @@ export function AdminContainer() {
       setDpUser("dp-none")
       setDpTableRating("dp-none")
       setCategory("films")
+      setDpChart('dp-none')
+    }
+    if (key == "6") {
+      setDpCreate("dp-none")
+      setDpTable("dp-none")
+      setDpUser("dp-none")
+      setDpTableRating("dp-none")
+      setCategory("films")
+      setDpChart('dp-block')
+    }
+    if (key == "7") {
+      setDpCreate("dp-none")
+      setDpTable("dp-none")
+      setDpUser("dp-none")
+      setDpTableRating("dp-none")
+      setCategory("series")
+      setDpChart('dp-block')
+
     }
     if (key == "4") {
       setDpCreate("dp-none")
       setDpTable("dp-none")
       setDpTableRating("dp-none")
       setDpUser("dp-block")
+      setDpChart('dp-none')
     }
     if (key == "5"){
       setDpCreate("dp-none")
       setDpTable("dp-none")
       setDpUser("dp-none")
       setDpTableRating("dp-block")
-      
+      setDpChart('dp-none')
     }
   }
   const { firebase } = useContext(FirebaseContext);
@@ -116,6 +139,10 @@ export function AdminContainer() {
                 <Menu.Item key="2">Series</Menu.Item>
                 <Menu.Item key="3">Films</Menu.Item>
               </SubMenu>
+              <SubMenu key="sub2" icon={<BarChartOutlined />} title="Chart">
+                <Menu.Item key="6">Series</Menu.Item>
+                <Menu.Item key="7">Films</Menu.Item>
+              </SubMenu>
               <Menu.Item key="5" icon={<CommentOutlined />}>
                 Rating User
             </Menu.Item>
@@ -130,6 +157,7 @@ export function AdminContainer() {
           <TableFilm className='tbl' displ={dpTable} category={category}></TableFilm>
           <ManageUsers displ={dpUser}></ManageUsers>
           <RatingUser displ={dpTableRating}></RatingUser>
+          <ChartFilm className='tbl' displ={dpChart} category={category}></ChartFilm>
         </Col>
       </Row>
     </>

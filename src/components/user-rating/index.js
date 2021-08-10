@@ -22,8 +22,8 @@ const validateMessages = {
 
 export default function UserRating({ item, userName }) {
   const formRef = React.createRef();
-  console.log(item);
-  console.log(userName);
+  // console.log(item);
+  // console.log(userName);
   const dispatch = useDispatch();
   const data = useSelector((state) => state.home);
   const { firebase } = useContext(FirebaseContext);
@@ -37,6 +37,16 @@ export default function UserRating({ item, userName }) {
     var avg = total / ar.length;
     return Math.round(avg);
   };
+  const a = async (arr) => {
+    console.log(arr);
+    await setDplModal('form-rating')
+    arr.filter((i) => i.film === item.docId).map((item)=>{
+      if(item.user===userName){
+        console.log('none');
+        setDplModal('dpl-none')
+      }
+    })
+  }
   const getDataSlice = async () => {
     await firebase
       .firestore()
@@ -47,16 +57,20 @@ export default function UserRating({ item, userName }) {
           ...contentObj.data(),
           docId: contentObj.id,
         }));
-        // console.log(allContent.filter((i) => i.filmName === item.film));
         setStar(averageStar(allContent.filter((i) => i.film === item.docId)))
         dispatch(addRatingModal(allContent.filter((i) => i.film === item.docId)));
-        allContent.filter((i) => i.film === item.docId).map((item)=>{
-          if(item.user===userName){
-            setDplModal('dpl-none')
-          }else{
-            setDplModal('form-rating')
-          }
-        })
+        console.log('setdispl');
+        a(allContent)
+        // allContent.filter((i) => i.film === item.docId).map((item)=>{
+        //   console.log('setdispl');
+        //   if(item.user===userName){
+        //     console.log('none');
+        //     setDplModal('dpl-none')
+        //   }else{
+        //     console.log('block');
+        //     setDplModal('form-rating')
+        //   }
+        // })
       })
       .catch((error) => {
         console.log(error.message);
@@ -79,8 +93,6 @@ export default function UserRating({ item, userName }) {
   useEffect(() => {
     getDataSlice();
   }, [item])
-
-  console.log(data.dataModel);
 
   return (
     <Body>

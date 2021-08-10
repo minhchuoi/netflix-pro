@@ -73,22 +73,23 @@ export default function TableFilm(props) {
     enableReinitialize: true,
     initialValues: initialValues,
     validationSchema: yup.object().shape({
-      addTitle: yup.string().required("Required"),
+      // addTitle: yup.string().required("Required"),
       addDescription: yup.string().required("Required"),
-      addRating: yup.string().required("Required"),
+      // addRating: yup.string().required("Required"),
       addMaturity: yup.string().required("Required"),
       addVideo: yup.string().required("Required"),
     }),
     onSubmit: async (value) => {
+      console.log(dataEdit);
       await firebase
         .firestore()
         .collection(props.category)
         .doc(dataEdit.docId)
         .set({
           id: dataEdit.id,
-          title: value.addTitle,
+          title: dataEdit.title,
           description: value.addDescription,
-          rating: value.addRating,
+          rating: dataEdit.rating,
           maturity: value.addMaturity,
           idVideo: value.addVideo,
         })
@@ -201,7 +202,7 @@ export default function TableFilm(props) {
         footer={null}
       >
         <form className="edit-detail" onSubmit={formik.handleSubmit}>
-          <label htmlFor="addTitle">Title</label>
+          {/* <label htmlFor="addTitle">Title</label>
           <Input
             className={
               formik.touched.addTitle && formik.errors.addTitle ? "input" : ""
@@ -213,7 +214,7 @@ export default function TableFilm(props) {
           ></Input>
           {formik.touched.addTitle && formik.errors.addTitle ? (
             <div>{formik.errors.addTitle}</div>
-          ) : null}
+          ) : null} */}
 
           <label htmlFor="addDescription">Description</label>
           <Input.TextArea
@@ -231,7 +232,7 @@ export default function TableFilm(props) {
             <div>{formik.errors.addDescription}</div>
           ) : null}
 
-          <label htmlFor="addRating">Rating</label>
+          {/* <label htmlFor="addRating">Rating</label>
           <Input
             className={
               formik.touched.addRating && formik.errors.addRating ? "input" : ""
@@ -243,7 +244,7 @@ export default function TableFilm(props) {
           ></Input>
           {formik.touched.addRating && formik.errors.addRating ? (
             <div>{formik.errors.addRating}</div>
-          ) : null}
+          ) : null} */}
 
           <label htmlFor="addMaturity">Maturity</label>
           <Input

@@ -16,13 +16,20 @@ export default function ManageUsers(props) {
     addEmail: "",
     addName: "",
   });
-  useEffect(() => {
-    dispatch(getData())
-  }, [dispatch])
+  const [dtUser, setDtUser] = useState([])
+
+  const dataTable = async()=>{
+    await dispatch(getData());
+    setDtUser(data.data.filter((item) => item.email !== 'ngoductuanminh9b@gmail.com'))
+  }
+
+  useEffect(async() => {
+    await dataTable()
+  }, [dtUser])
 
   const deleteItem = async(value) => {
     await dispatch(deleteData(value.uid));
-    dispatch(getData());
+    dataTable()
     setTimeout(() => location.reload(), 3000);
   };
 
@@ -63,7 +70,7 @@ export default function ManageUsers(props) {
       }));
       formik.resetForm();
       setIsModalVisible(false);
-      dispatch(getData())
+      dataTable()
       // setTimeout(() => location.reload(), 1500);
     },
   });
@@ -118,11 +125,12 @@ export default function ManageUsers(props) {
         justify="end"
         className="table"
         columns={columns}
-        dataSource={data.data}
+        dataSource={dtUser}
       ></Table>
       <Modal
         visible={isModalVisible}
         onCancel={handleCancel}
+        footer={null}
       >
         <form className="edit-detail" onSubmit={formik.handleSubmit}>
           <label htmlFor="Email">Email</label>

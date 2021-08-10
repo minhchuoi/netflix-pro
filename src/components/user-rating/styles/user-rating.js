@@ -31,6 +31,7 @@ export const Body = styled.div`
     margin-left: 12px;
   }
   .form-rating{
+    display: block;
     margin-top: 30px;
   }
   .viewer-rating{
